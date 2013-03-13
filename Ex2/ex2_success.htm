@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<title>Exercise 2: KML Overlays</title>
+<script type="text/javascript" src=
+"http://maps.googleapis.com/maps/api/js?v=3&sensor=false">
+</script>
+<script type="text/javascript">
+/*
+	Exercise 2 Step 1: Add One KML
+*/
+var map;
+
+//set up arrays for KML urls - add your chosen KML here, as kmlOverlays[0] = new ...
+var kmlOverlays = [];
+kmlOverlays[0] = new google.maps.KmlLayer('http://geocommons.com/overlays/138446.kml',{preserveViewport: true}) //Fill in your KML link in between the single quotes
+kmlOverlays[1] = new google.maps.KmlLayer('http://www.sos.state.mn.us/Modules/ShowDocument.aspx?documentid=9313',{preserveViewport: true})//fill in for KML #1 (the second in the array)
+kmlOverlays[2] = new google.maps.KmlLayer('http://www.crh.noaa.gov/images/mpx/geo/mndot.kml',{preserveViewport: true})//fill in for KML #2 (the third in the array)
+
+var kmlToggleStates = [];
+kmlToggleStates[0] = true;
+kmlToggleStates[1] = true;
+kmlToggleStates[2] = true;
+
+function initialize() {
+    var myLatLng = new google.maps.LatLng(46.5, -94.5);
+    var myOptions = {
+      zoom: 6,
+      center: myLatLng,
+      mapTypeId: google.maps.MapTypeId.ROADMAP
+    };
+    map = new google.maps.Map(document.getElementById("map"), myOptions);
+	
+	for (var i = 0; i < kmlOverlays.length; i++) {
+		kmlOverlays[i].setMap(map);
+	}
+}
+
+function toggLegend(index) {
+    if (kmlToggleStates[index]) {
+        kmlToggleStates[index]=false;
+    } else {
+        kmlToggleStates[index]=true;
+    }
+    loadKML();
+
+}
+
+function loadKML() {
+    var i;
+    for (i = 0; i < kmlOverlays.length; i++) {
+        kmlOverlays[i].setMap(null);
+    }
+    for (i = 0; i < kmlOverlays.length; i++) {
+        if (kmlToggleStates[i]) {
+            kmlOverlays[i].setMap(map);
+        }
+    }
+}
+
+
+</script>
+<style type="text/css">
+  html { height: 100% }
+  body { height: 100%; margin: 0px; padding: 0px }
+  #map, #side {
+    float: left;
+  }
+ #side {
+  margin-right: 5px;
+  padding: 2px 4px;
+  text-align: right;
+  width: 210px;
+  }
+  #map {
+  width: 750px;
+  height: 600px;
+  }
+</style>
+</head>
+
+    <body onload="initialize()">
+        <div id="side">
+ <table id="tblTOC" width="150px">
+                <tr>
+                    <td><input type="checkbox" id="chk2" checked=
+                    "checked" onclick="toggLegend(2);"></td>
+                    <td><strong id="leglbl2">KML 2</strong></td>
+                    <td><img id="leg2" src="http://gis.mda.state.mn.us/images/iconHelp.gif"
+                    alt="Legend 2"></td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox" id="chk1" checked=
+                    "checked" onclick="toggLegend(1);"></td>
+                    <td><strong id="leglbl1">KML 1</strong></td>
+                    <td><img id="leg1" src="http://gis.mda.state.mn.us/images/iconHelp.gif"
+                    alt="Legend 1"></td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox" id="chk0" checked=
+                    "checked" onclick="toggLegend(0);"></td>
+                    <td><strong id="leglbl0">KML 0</strong></td>
+                    <td><img id="leg0" src="http://gis.mda.state.mn.us/images/iconHelp.gif"
+                    alt="Legend 0"></td>
+                </tr>
+            </table>
+
+        </div>
+
+        <div id="map">
+        </div>
+    </body>
+</html>
+

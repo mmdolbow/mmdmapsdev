@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<title>Exercise 2: KML Overlays</title>
+<script type="text/javascript" src=
+"http://maps.googleapis.com/maps/api/js?v=3&sensor=false">
+</script>
+<script type="text/javascript">
+/* *******************************
+	Exercise 2: KML Overlays
+*/
+var map;
+/* *******************************
+//set up arrays for KML urls - add your chosen KML here, as kmlOverlays[0] = new ...
+*/
+var kmlOverlays = [];
+
+function initialize() {
+    var myLatLng = new google.maps.LatLng(46.5, -94.5);
+    var myOptions = {
+      zoom: 6,
+      center: myLatLng,
+      mapTypeId: google.maps.MapTypeId.ROADMAP
+    };
+    map = new google.maps.Map(document.getElementById("map"), myOptions);
+/* *******************************
+	Set map for the KML here
+*/
+
+}
+
+</script>
+<style type="text/css">
+  html { height: 100% }
+  body { height: 100%; margin: 0px; padding: 0px }
+  #map, #side {
+    float: left;
+  }
+ #side {
+  margin-right: 5px;
+  padding: 2px 4px;
+  text-align: right;
+  width: 210px;
+  }
+  #map {
+  width: 750px;
+  height: 600px;
+  }
+</style>
+</head>
+
+    <body onload="initialize()">
+        <div id="side">
+ 
+        </div>
+
+        <div id="map">
+        </div>
+    </body>
+</html>
+

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>Exercise 1 Final</title>
+
+
+<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?v=3&sensor=false"></script>
+
+<script type="text/javascript">
+	
+var csgName = "Minnesota River nr Lac Qui Parle, MN"; 
+var csgID =22007001;
+var csgLatLong = new google.maps.LatLng(45.0206, -95.8689); 
+
+
+/* *******************************
+Base variables to use for the stream gage graphs
+*/
+var imgHeight = 300;	
+var imgWidth = 500;	
+var weekAgo = new Date();
+var yesterday = new Date();
+weekAgo.setDate(weekAgo.getDate()-7);
+yesterday.setDate(yesterday.getDate()-1);
+var gEndFullDate = yesterday.getFullYear() + "-" + (yesterday.getMonth()+1) + "-" + yesterday.getDate();
+var gStartFullDate = weekAgo.getFullYear() + "-" + (weekAgo.getMonth()+1) + "-" + weekAgo.getDate();
+var baseGraphURL = ["http://maps1.dnr.state.mn.us/cgi-bin/csg/hydrograph_cgi.py?var1=232&show_legend=1&show_grid=1&site="];
+var tailGraphURL = ["&start="+gStartFullDate+"&end="+gEndFullDate];
+
+
+/* *******************************
+	Map Initialize Function
+	Sets center point at latlng, options, and establishes the map.
+	Also adds the marker for the stream gage.
+*/
+var map;
+  function initialize() {
+    var latlng = new google.maps.LatLng(45.00,-95.75);
+    var myOptions = {
+      zoom: 10, 
+      center: latlng,
+      mapTypeId: google.maps.MapTypeId.ROADMAP
+    };
+    map = new google.maps.Map(document.getElementById("map_canvas"),myOptions);
+		
+	var marker = new google.maps.Marker({
+	  	position:csgLatLong,
+		map: map		
+	  }); 
+	createInfoWindow(marker, csgID, csgName);
+
+  }
+
+/* *******************************
+	Create InfoWindow Function
+	Establishes HTML for the infoWindow, identifying the stream gage ID and creating the graph.
+	Also adds listeners for clicking the markers and panning back to origin of the infowindow.
+*/
+function createInfoWindow(marker, ID, csgName) {
+		
+	var myHtml = "<img src=\""+ 
+	baseGraphURL + ID + tailGraphURL + 
+	"&height="+
+	imgHeight+
+	"&width="+
+	imgWidth+
+	"\" height=\""+
+	imgHeight+
+	"\" width=\""+
+	imgWidth+
+	"\">";
+
+	var infowindow = new google.maps.InfoWindow({
+		position: marker.getPosition(),
+	  	content: myHtml
+	});
+  
+    google.maps.event.addListener(marker, 'click', function() {
+		infowindow.open(map,marker);
+		updateDetails(ID, csgName);
+	}); 
+	
+    google.maps.event.addListener(infowindow,'closeclick', function() {
+		map.panTo(infowindow.getPosition());
+		clearDetails();
+    }); 
+}
+
+/* *******************************
+	Update and Clear Details Functions
+	Establishes HTML for the details div, identifying the stream gage ID and name.
+*/
+function updateDetails(ID, csgName) {
+	var deetHtml = "<p>Stream Gage ID: "+ID+", "+csgName+"</p>";
+	document.getElementById("details").innerHTML = deetHtml;
+}
+
+function clearDetails() {
+	document.getElementById("details").innerHTML = "";
+}
+
+</script>
+
+<style type="text/css">
+  html { height: 100% }
+  body { height: 100%; margin: 0px; padding: 0px }
+</style>
+
+</head>
+	<body onload="initialize()">
+  		<div id="map_canvas" style="width:100%; height:80%"></div>
+		<div id="details" style="width:100%"></div>
+	</body>
+</html>

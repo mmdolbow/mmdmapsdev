@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <meta name="generator" content="HTML Tidy, see www.w3.org">
+
+        <title>Exercise 2 Final</title>
+<script type="text/javascript" src=
+"http://maps.googleapis.com/maps/api/js?v=3&sensor=false">
+</script>
+<script type="text/javascript">
+
+var map;
+var kml;
+
+//set up arrays for KML urls and toggle states. The following MUST ALIGN!
+var kmlOverlays = [];
+kmlOverlays[0] = new google.maps.KmlLayer('http://geocommons.com/overlays/138446.kml',{preserveViewport: true});
+kmlOverlays[1] = new google.maps.KmlLayer('http://www.crh.noaa.gov/images/mpx/geo/mndot.kml',{preserveViewport: true});
+kmlOverlays[2] = new google.maps.KmlLayer('http://gis.mda.state.mn.us/kml/Wellhead_Protection_Areas.kmz',{preserveViewport: true});
+
+var kmlToggleStates = [];
+// map must initially have all layers set to 'true'. 
+kmlToggleStates[0] = true; //Motor Cycle Rallies
+kmlToggleStates[1] = true; //Weather Stations
+kmlToggleStates[2] = true; //WHPA
+
+function KmlManager() {
+  this.layers = [];
+}
+
+KmlManager.prototype.addLayer = function(kmlLayer) {
+  this.layers.push(kmlLayer);
+}
+
+KmlManager.prototype.setMap = function(map) {
+
+  var layers = this.layers;
+
+  function setMapLayer(i) {
+    layers[i].setMap(map);
+    google.maps.event.addListenerOnce(layers[i], 'metadata_changed', function() {
+        switch(i) {
+            case 0:
+                document.getElementById("leg0").src = "http://maps.google.com/mapfiles/kml/shapes/hiker.png";
+                document.getElementById("leglbl0").innerHTML = kmlOverlays[0].getMetadata().name;
+				break;
+            case 1:
+                document.getElementById("leg1").src = "http://www.crh.noaa.gov/images/mpx/geo/blueDot.png";
+                document.getElementById("leglbl1").innerHTML = kmlOverlays[1].getMetadata().author;
+				break;
+            case 2:
+                document.getElementById("leg2").src = "http://gis.mda.state.mn.us/images/sw_legend_whpa.jpg";
+				document.getElementById("leglbl2").innerHTML = kmlOverlays[2].getMetadata().name;
+                break;
+        }
+
+      if (i<layers.length-1) {
+        setMapLayer(i+1);
+      }
+    });
+  }
+
+  setMapLayer(0);
+}
+
+
+function initialize() {
+    var myLatLng = new google.maps.LatLng(46.5, -94.5);
+    var myOptions = {
+      zoom: 6,
+      center: myLatLng,
+      mapTypeId: google.maps.MapTypeId.ROADMAP
+    };
+    map = new google.maps.Map(document.getElementById("map"), myOptions);
+
+    google.maps.event.addListenerOnce(map, "tilesloaded", function() {
+        //alert("Tiles have loaded.");
+        kml = new KmlManager();
+          for (var i = 0; i < kmlOverlays.length; i++) {
+            //alert("Adding KML Overlay "+i);
+            kml.addLayer(kmlOverlays[i]);
+          };
+        kml.setMap(map);
+    });
+
+}
+
+
+
+function toggLegend(index) {
+//toggle the KML with the checkboxes in the legend
+    if (kmlToggleStates[index]) {
+        kmlToggleStates[index]=false;
+    } else {
+        kmlToggleStates[index]=true;
+    }
+    loadKML();
+
+}
+
+function loadKML() {
+    var i;
+    // Turn off all the KML layers
+    for (i = 0; i < kmlOverlays.length; i++) {
+        kmlOverlays[i].setMap(null);
+    }
+    // Turn on just the ones we want in the correct order
+    for (i = 0; i < kmlOverlays.length; i++) {
+        if (kmlToggleStates[i]) {
+            kmlOverlays[i].setMap(map);
+        }
+    }
+}
+
+
+
+</script>
+<style type="text/css">
+  html { height: 100% }
+  body { height: 100%; margin: 0px; padding: 0px }
+  #map, #side {
+    float: left;
+  }
+ #side {
+  margin-right: 5px;
+  padding: 2px 4px;
+  text-align: right;
+  width: 210px;
+  }
+  #map {
+  width: 750px;
+  height: 600px;
+  }
+</style>
+</head>
+
+    <body onload="initialize()">
+        <div id="side">
+            <table id="tblTOC" width="150px">
+                <tr>
+                    <td><input type="checkbox" id="chk2" checked=
+                    "checked" onclick="toggLegend(2);"></td>
+                    <td><strong id="leglbl2">KML 2</strong></td>
+                    <td><img id="leg2" src="http://gis.mda.state.mn.us/images/throbber.gif"
+                    alt="Legend 2"></td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox" id="chk1" checked=
+                    "checked" onclick="toggLegend(1);"></td>
+                    <td><strong id="leglbl1">KML 1</strong></td>
+                    <td><img id="leg1" src="http://gis.mda.state.mn.us/images/throbber.gif"
+                    alt="Legend 1"></td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox" id="chk0" checked=
+                    "checked" onclick="toggLegend(0);"></td>
+                    <td><strong id="leglbl0">KML 0</strong></td>
+                    <td><img id="leg0" src="http://gis.mda.state.mn.us/images/throbber.gif"
+                    alt="Legend 0"></td>
+                </tr>
+            </table>
+        </div>
+
+        <div id="map">
+        </div>
+    </body>
+</html>
+

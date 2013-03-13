@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>Exercise 1: Static Locations</title>
+<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?v=3&sensor=false"></script>
+
+<script type="text/javascript">
+/*
+	Exercise 1, Step 1 - Customize the map.
+	Step 1 Goals:
+	1. Establish the map in the initialize function
+	2. Set the LatLng to coordinates that you want the map to center on.
+	3. Set the zoom level to your preference: 0 is a large area, 18 is a small area
+	4. Play with different map types like SATELLITE, HYBRID, and TERRAIN 
+	5. Change the map_canvas and details div percentages to match your preference
+*/
+
+/* *******************************
+	Map Initialize Function
+	Sets center point at latlng, options, and establishes the map.
+*/
+var csgName = "This is Mike's site name";  //type in your site name here
+var csgID = 22007001; // type in your ID here
+var csgLatLong = new google.maps.LatLng(45.0206, -95.8689); //replace the lat/longs with your stream gage
+var imgHeight = 300;	
+var imgWidth = 500;	
+var weekAgo = new Date();
+var yesterday = new Date();
+weekAgo.setDate(weekAgo.getDate()-7);
+yesterday.setDate(yesterday.getDate()-1);
+var gEndFullDate = yesterday.getFullYear() + "-" + (yesterday.getMonth()+1) + "-" + yesterday.getDate();
+var gStartFullDate = weekAgo.getFullYear() + "-" + (weekAgo.getMonth()+1) + "-" + weekAgo.getDate();
+var baseGraphURL = ["http://maps1.dnr.state.mn.us/cgi-bin/csg/hydrograph_cgi.py?var1=232&show_legend=1&show_grid=1&site="];
+var tailGraphURL = ["&start="+gStartFullDate+"&end="+gEndFullDate];
+
+
+var map;
+  function initialize() {
+	var latlng = new google.maps.LatLng(45.02,-95.86);
+   var myOptions = {
+     zoom: 11, 
+     center: latlng,
+     mapTypeId: google.maps.MapTypeId.HYBRID
+   };
+map = new google.maps.Map(document.getElementById("map_canvas"),myOptions);
+
+	var marker = new google.maps.Marker({
+	  	position:csgLatLong,
+		map: map		
+	  });
+createInfoWindow(marker, csgID, csgName); //ONLY INCLUDE THIS LINE!
+  }
+
+function createInfoWindow(marker, ID, csgName) {
+		
+	var myHtml = "<img src=\""+ 
+	baseGraphURL + ID + tailGraphURL + 
+	"&height="+
+	imgHeight+
+	"&width="+
+	imgWidth+
+	"\" height=\""+
+	imgHeight+
+	"\" width=\""+
+	imgWidth+
+	"\">";
+
+	var infowindow = new google.maps.InfoWindow({
+		position: marker.getPosition(),
+	  	content: myHtml
+	});
+	
+     google.maps.event.addListener(marker, 'click', function() {
+		infowindow.open(map,marker);
+	}); 
+	
+}
+
+
+</script>
+
+<style type="text/css">
+  html { height: 100% }
+  body { height: 100%; margin: 0px; padding: 0px }
+</style>
+
+</head>
+	<body onload="initialize()">
+  		<div id="map_canvas" style="width:100%; height:80%">This is where the map will go</div>
+		<div id="details" style="width:100%"></div>
+	</body>
+</html>
