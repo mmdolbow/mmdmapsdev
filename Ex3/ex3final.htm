@@ -31,7 +31,7 @@ function initialize() {
 	};
     map = new google.maps.Map(document.getElementById("map"), myOptions);
 						
-	var url = 'http://server.arcgisonline.com/ArcGIS/rest/services/Demographics/USA_Population_Density/MapServer'; 
+	var url = 'https://server.arcgisonline.com/ArcGIS/rest/services/Demographics/USA_Population_Density/MapServer'; 
 	var agsType = new gmaps.ags.MapType(url,{name:'arcgis', opacity:0.5});
     map.overlayMapTypes.insertAt(0, agsType);
 	
