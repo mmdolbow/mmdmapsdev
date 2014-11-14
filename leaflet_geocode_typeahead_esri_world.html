@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Leaflet Geocode with Typeahead against Esri World geocoder</title>
+	<meta charset="utf-8" />
+
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<!--jquery bootstraps -->
+	<link rel="stylesheet" href="http://code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css">
+	<link rel="stylesheet" href="http://jqueryui.com/resources/demos/style.css">
+	<script src="http://code.jquery.com/jquery-1.10.2.js"></script>
+	<script src="http://code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
+	
+	<!-- Leaflet bootstraps -->
+	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
+	<script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+	<script>
+	/*
+	Has: Typeahead wired to Esri's world geocoder
+	Needs: After choosing results, get the lat long, dump in a marker, etc
+	*/
+	
+	function initmap() {
+		var map = L.map('map').setView([44.9, -93.2], 9);
+
+		var MapQuestOpen_OSM = L.tileLayer('http://otile{s}.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.jpeg', {
+			attribution: 'Tiles Courtesy of <a href="http://www.mapquest.com/">MapQuest</a> &mdash; Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
+			subdomains: '1234'
+		});
+		map.addLayer(MapQuestOpen_OSM);
+	}
+	
+	//Typeahead function from http://jqueryui.com/autocomplete/#remote-jsonp
+	
+	 $(function() {
+		function log( message ) {
+			$( "<div>" ).text( message ).prependTo( "#log" );
+			$( "#log" ).scrollTop( 0 );
+		}
+		
+		$( "#Address" ).autocomplete({
+				source: function( request, response ) {
+					$.ajax({
+						url: "http://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/suggest?f=json",
+						dataType: "jsonp",
+						data: {
+							text: request.term +', Minnesota, United States'
+						},
+						success: function( data ) {
+							var suggArray = [];
+							for (i=0; i < data.suggestions.length; i++) {
+								suggArray.push(data.suggestions[i].text);
+							}
+							response( suggArray );
+						}
+					});
+			},
+			minLength: 3,
+			select: function( event, ui ) {
+				log( ui.item ?
+					"Selected: " + ui.item.label :
+					"Nothing selected, input was " + this.value);
+			},
+			open: function() {
+				$( this ).removeClass( "ui-corner-all" ).addClass( "ui-corner-top" );
+			},
+			close: function() {
+				$( this ).removeClass( "ui-corner-top" ).addClass( "ui-corner-all" );
+			}
+		});
+	});
+
+	</script>
+	</head>
+<body onload="initmap()">
+	<div id="map" style="width: 600px; height: 400px"></div>
+	<div class="ui-widget">
+		<label for="Address">Address: </label>
+		<input id="Address">
+		Powered by <a href="http://esri.com">esri.com</a>
+	</div>
+	<div class="ui-widget" style="margin-top:2em; font-family:Arial">
+		Result:
+	<div id="log" style="height: 200px; width: 300px; overflow: auto;" class="ui-widget-content"></div>
+	</div>
+
+
+</body>
+</html>
