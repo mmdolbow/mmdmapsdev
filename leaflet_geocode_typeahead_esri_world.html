@@ -16,12 +16,16 @@
 	<script src="//cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
 	<script>
 	/*
-	Has: Typeahead wired to Esri's world geocoder
-	Needs: After choosing results, get the lat long, dump in a marker, etc
+	Example hybrid solution.
+	Has: Typeahead wired to Esri's world geocoder for suggestions
+	Jquery for typeahead and ajax calls
+	Leaflet map with MapQuest Open tiles
 	*/
 	
+	//Leaflet Map
+	var map;
 	function initmap() {
-		var map = L.map('map').setView([44.9, -93.2], 9);
+		map = L.map('map').setView([46.0, -94.0], 6);
 
 		var MapQuestOpen_OSM = L.tileLayer('http://otile{s}.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.jpeg', {
 			attribution: 'Tiles Courtesy of <a href="http://www.mapquest.com/">MapQuest</a> &mdash; Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
@@ -51,7 +55,7 @@
 							for (i=0; i < data.suggestions.length; i++) {
 								suggArray.push(data.suggestions[i].text);
 							}
-							response( suggArray );
+							response(suggArray);
 						}
 					});
 			},
@@ -60,6 +64,8 @@
 				log( ui.item ?
 					"Selected: " + ui.item.label :
 					"Nothing selected, input was " + this.value);
+				//Send the selected to the geocoder
+				geocodeAddress(ui.item.label);
 			},
 			open: function() {
 				$( this ).removeClass( "ui-corner-all" ).addClass( "ui-corner-top" );
@@ -69,6 +75,23 @@
 			}
 		});
 	});
+	
+	//Geocode the address
+	function geocodeAddress(address) {
+		$.ajax({
+			url: "http://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates?",
+			dataType: "jsonp",
+				data: {
+					SingleLine: address,
+					f: 'json',
+					maxLocations: '4',
+					outSR: {"wkid":102100,"latestWkid":3857}
+				},
+				success: function( data ) {
+					var marker = new L.Marker([data.candidates[0].location.y,data.candidates[0].location.x]).addTo(map);
+				}
+			});
+	}
 
 	</script>
 	</head>
