@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Leaflet Test</title>
+<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
+<script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+<script>
+        var map;
+        //assume base WebMercator spatial reference. If you want something different, you'll need https://github.com/kartena/Proj4Leaflet
+        function initmap() {
+               map = new L.map('map', {
+                       center: [45.0, -94.0],
+                       zoom: 10
+                       });
+               /* The OSM suggested method
+               // create the tile layer with correct attribution
+               var osmUrl='http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+               var osmAttrib='Map data Â© <a href="http://openstreetmap.org">OpenStreetMap</a> contributors';
+               var osm = new L.TileLayer(osmUrl, {minZoom: 4, maxZoom: 14, attribution: osmAttrib});           
+
+               // start the map in Minnesota
+               map.setView(new L.LatLng(45.0, -97.5),6);
+               map.addLayer(osm); */
+               
+               /*The leaflet tutorial method with Mapbox, that has limited free usage */
+               
+               /*L.tileLayer('https://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png', {
+                       maxZoom: 18,
+                       attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
+                               '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+                               'Imagery Â© <a href="http://mapbox.com">Mapbox</a>',
+                       id: 'examples.map-i875mjb7'
+               }).addTo(map);*/
+               
+               
+               
+               //or ESRI leaflet (another script source) - can we just figure out how to use Esri tiles without a separate bootstrap?
+                               //yes look here https://github.com/leaflet-extras/leaflet-providers 
+               /*             
+               var Esri_WorldGrayCanvas = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+                       attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ',
+                       maxZoom: 16
+               });
+               map.addLayer(Esri_WorldGrayCanvas);
+               */
+               
+               //try a WMS with TileLayer.WMS //http://leafletjs.com/reference.html#tilelayer-wms
+               var mngeocomp = L.tileLayer.wms("http://geoint.lmic.state.mn.us/cgi-bin/mncomp?", {
+                   layers: 'mncomp',
+                   format: 'image/jpeg',
+                  transparent: false,
+                   version: '1.1.1',
+                   attribution: 'MnGeo Composite Imagery',
+               });
+               
+               map.addLayer(mngeocomp);
+               
+               //Add a basemap - here's ESRI's transparent reference
+               /*var basemap = L.tileLayer('http://services.arcgisonline.com/arcgis/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}', {
+                       attribution: 'Tiles &copy; Esri, HERE, DeLorme, MapmyIndia, Â© OpenStreetMap contributors',
+                       maxZoom: 16
+               }); */
+			   
+			   //Here's an acetage foreground layer from GeoIQ
+               var basemap = L.tileLayer('http://a{s}.acetate.geoiq.com/tiles/acetate-fg/{z}/{x}/{y}.png', {
+					attribution: '&copy;2012 Esri & Stamen, Data from OSM and Natural Earth',
+					subdomains: '0123',
+					minZoom: 2,
+					maxZoom: 18,
+					opacity: .75
+				});
+               map.addLayer(basemap);
+        }
+</script>
+<style>#map { height: 600px; }</style>
+
+</head>
+<body onload="initmap()">
+<div id="map"></div>
+
+</body>
+</html>
